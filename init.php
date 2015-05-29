@@ -18,7 +18,7 @@ function hidelinks_replace_callback( $matches )
     }
 
     //dont replace links if host is the same
-    if ( ( $parts["host"] == $_SERVER["HTTP_HOST"] ) or ( $parts["host"] == "www.".$_SERVER["HTTP_HOST"] ) ) 
+    if ( empty($parts["host"]) or ( $parts["host"] == $_SERVER["HTTP_HOST"] ) or ( $parts["host"] == "www.".$_SERVER["HTTP_HOST"] ) ) 
     {
         return $matches[0];
     }
@@ -28,11 +28,21 @@ function hidelinks_replace_callback( $matches )
 
 function hidelinks_global(OW_Event $event)
 {
+    if (OW::getConfig()->getValue('hidelinks','new_tab') == 1)
+    {
+        OW::getDocument()->addOnloadScript('$("a[href^=\''.HIDELINKS_BASEURL . 'awayto/'.'\']").attr("target","_blank")');
+    }
     OW::getDocument()->setBody(preg_replace_callback('/<a.+?href="(.+?)".*?>/si',"hidelinks_replace_callback", OW::getDocument()->getBody()));
 }
 
 define("HIDELINKS_BASEURL", OW::getRouter()->getBaseUrl());
 OW::getRouter()->addRoute(new OW_Route('hidelinks-awayto', 'awayto/:href', 'HIDELINKS_CTRL_Links', 'awayto'));
 OW::getEventManager()->bind('core.finalize', 'hidelinks_global');
+
+OW::getRouter()->addRoute(new OW_Route('hidelinks_admin', 'admin/hidelinks', 'HIDELINKS_CTRL_Admin', 'index'));
+
+
+
+
 
 ?>

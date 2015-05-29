@@ -14,7 +14,17 @@ class HIDELINKS_CTRL_Links extends OW_ActionController
         {
             throw new Redirect404Exception();
         }
-        $this->redirect($href);
+        $timeout = OW::getConfig()->getValue('hidelinks','redirect_timeout');
+        if ($timeout == 0)
+        {
+            $this->redirect($href);
+        }
+        else
+        {
+            OW::getDocument()->addMetaInfo('refresh',$timeout . ';url=' . $href, 'http-equiv');
+            $this->assign('redirect_url',$href);
+            $this->assign('timeout', $timeout);
+        }
     }
 
 }
