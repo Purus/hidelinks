@@ -1,13 +1,11 @@
 <?php
 
 /**
- * (c) Alexandr Makarov, 2013
+ * (c) Alexandr Makarov, 2015
  * notengine@gmail.com
  * 
  */
 
-//define("HIDELINKS_DEBUG","");
- 
 function hidelinks_replace_callback( $matches )
 {
     $parts = parse_url($matches[1]);
@@ -26,6 +24,11 @@ function hidelinks_replace_callback( $matches )
     return str_replace($matches[1], HIDELINKS_BASEURL . "awayto/" . base64_encode($matches[1]), $matches[0]);
 }
 
+/**
+* This function is called before each page rendering and replaces links using regular expression
+* 
+* @param OW_Event $event
+*/
 function hidelinks_global(OW_Event $event)
 {
     if (OW::getConfig()->getValue('hidelinks','new_tab') == 1)
@@ -36,6 +39,7 @@ function hidelinks_global(OW_Event $event)
 }
 
 define("HIDELINKS_BASEURL", OW::getRouter()->getBaseUrl());
+
 OW::getRouter()->addRoute(new OW_Route('hidelinks-awayto', 'awayto/:href', 'HIDELINKS_CTRL_Links', 'awayto'));
 OW::getEventManager()->bind('core.finalize', 'hidelinks_global');
 
